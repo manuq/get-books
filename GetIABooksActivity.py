@@ -1076,7 +1076,7 @@ class GetIABooksActivity(activity.Activity):
         _stop_alert.props.msg = msg
         open_icon = Icon(icon_name='zoom-activity')
         _stop_alert.add_button(Gtk.ResponseType.APPLY,
-                                    _('Show in Journal'), open_icon)
+                                    _('Start'), open_icon)
         open_icon.show()
         ok_icon = Icon(icon_name='dialog-ok')
         _stop_alert.add_button(Gtk.ResponseType.OK, _('Ok'), ok_icon)
@@ -1091,8 +1091,16 @@ class GetIABooksActivity(activity.Activity):
 
     def __stop_response_cb(self, alert, response_id):
         if response_id is Gtk.ResponseType.APPLY:
-            activity.show_object_in_journal(self._object_id)
+            self._start_activity_with_object('org.laptop.sugar.ReadActivity',
+                                             self._object_id)
         self.remove_alert(alert)
+
+    def _start_activity_with_object(self, bundle_id, object_id):
+        from sugar3.activity import activityfactory
+        from jarabe.model.bundleregistry import get_registry
+        bundle = get_registry().get_bundle(bundle_id)
+
+        activityfactory.create_with_object_id(bundle, object_id)
 
     def _get_preview_image_buffer(self):
         preview_width, preview_height = style.zoom(300), style.zoom(225)
